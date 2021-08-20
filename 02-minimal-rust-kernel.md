@@ -193,6 +193,15 @@ error[E0463]: can't find crate for `compiler_builtins`
 
 ### Cargo xbuild
 
+2021/08/20 note:
+
+通过在.cargo/config文件中添加以下配置
+
+```
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
+```
+
 这就是为什么我们需要[cargo xbuild工具](https://github.com/rust-osdev/cargo-xbuild)。这个工具封装了`cargo build`；但不同的是，它将自动交叉编译`core`库和一些**编译器内建库**（compiler built-in libraries）。我们可以用下面的命令安装它：
 
 ```bash
@@ -287,7 +296,7 @@ pub extern "C" fn _start() -> ! {
 # in Cargo.toml
 
 [dependencies]
-bootloader = "0.6.0"
+bootloader = "^0.9.19" //2021/08/20 note: up to date
 ```
 
 只添加引导程序为依赖项，并不足以创建一个可引导的磁盘映像；我们还需要内核编译完成之后，将内核和引导程序组合在一起。然而，截至目前，原生的cargo并不支持在编译完成后添加其它步骤（详见[这个issue](https://github.com/rust-lang/cargo/issues/545)）。
@@ -296,6 +305,12 @@ bootloader = "0.6.0"
 
 ```bash
 cargo install bootimage --version "^0.7.3"
+```
+
+2021/08/20 note: 直接安装最新版本
+
+```bash
+cargo install bootimage
 ```
 
 参数`^0.7.3`是一个**脱字号条件**（[caret requirement](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#caret-requirements)），它的意义是“0.7.3版本或一个兼容0.7.3的新版本”。这意味着，如果这款工具发布了修复bug的版本`0.7.4`或`0.7.5`，cargo将会自动选择最新的版本，因为它依然兼容`0.7.x`；但cargo不会选择`0.8.0`，因为这个版本被认为并不和`0.7.x`系列版本兼容。需要注意的是，`Cargo.toml`中定义的依赖包版本都默认是脱字号条件：刚才我们指定`bootloader`包的版本时，遵循的就是这个原则。
