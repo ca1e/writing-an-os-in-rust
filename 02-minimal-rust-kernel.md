@@ -200,6 +200,7 @@ error[E0463]: can't find crate for `compiler_builtins`
 ```
 [unstable]
 build-std = ["core", "compiler_builtins", "alloc"]
+build-std-features = ["compiler-builtins-mem"]
 ```
 
 这就是为什么我们需要[cargo xbuild工具](https://github.com/rust-osdev/cargo-xbuild)。这个工具封装了`cargo build`；但不同的是，它将自动交叉编译`core`库和一些**编译器内建库**（compiler built-in libraries）。我们可以用下面的命令安装它：
